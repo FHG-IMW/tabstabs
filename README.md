@@ -1,15 +1,18 @@
-![Travis Status](https://api.travis-ci.org/devmynd/tabs.png)
+![Travis Status](https://api.travis-ci.org/FHG-IMW/tabstabs.png)
 
-# Tabs
+# TabsTabs
 
-Tabs is a redis-backed metrics tracker for time-based events that supports counts, sums,
+TabsTabs  is a redis-backed metrics tracker for time-based events that supports counts, sums,
 averages, and min/max, and task based stats sliceable by the minute, hour, day, week, month, and year.
+
+This gem is a fork of [Tabs](https://github.com/devmynd/tabs). We want to keep the project alive
+and compatible with resent Ruby and Rails versions.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'tabs'
+    gem 'TabsTabs'
 
 And then execute:
 
@@ -17,7 +20,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install tabs
+    $ gem install TabsTabs
 
 ## Usage
 
@@ -28,35 +31,35 @@ Metrics come in three flavors: counters, values, and tasks.
 A counter metric simply records the number of events that occur within a given timeframe.  To create a counter metric called ‘website-visits’, simply call:
 
 ```ruby
-Tabs.create_metric("website-visits", "counter")
+TabsTabs .create_metric("website-visits", "counter")
 ```
 
-Tabs will also create a counter metric automatically the first time you
+TabsTabs  will also create a counter metric automatically the first time you
 increment the counter.
 
 To increment a metric counter, simply call:
 
 ```ruby
-Tabs.increment_counter("website-visits")
+TabsTabs .increment_counter("website-visits")
 ```
 
 If you need to retroactively increment the counter for a specific
 timestamp, just pass it in.
 
 ```ruby
-Tabs.increment_counter("wibsite-visits", Time.now - 2.days)
+TabsTabs .increment_counter("wibsite-visits", Time.now - 2.days)
 ```
 
-To retrieve the counts for a given time period just call `Tabs#get_stats` with the name of the metric, a range of times defining the period for which you want stats, and the resolution at which the data should be aggregated.
+To retrieve the counts for a given time period just call `TabsTabs #get_stats` with the name of the metric, a range of times defining the period for which you want stats, and the resolution at which the data should be aggregated.
 
 ```ruby
-Tabs.get_stats("website-visits", 10.days.ago..Time.now, :hour)
+TabsTabs .get_stats("website-visits", 10.days.ago..Time.now, :hour)
 ```
 
-This will return stats for the last 10 days by hour in the form of a `Tabs::Metrics::Counter::Stats` object.  This object is enumerable so you can iterate through the results like so:
+This will return stats for the last 10 days by hour in the form of a `TabsTabs ::Metrics::Counter::Stats` object.  This object is enumerable so you can iterate through the results like so:
 
 ```ruby
-results = Tabs.get_stats("website-visits", 10.days.ago..Time.now, :hour)
+results = TabsTabs .get_stats("website-visits", 10.days.ago..Time.now, :hour)
 results.each { |r| puts r }
 
 #=>
@@ -90,45 +93,45 @@ Lastly, you can access the overall total for a counter (for all time)
 using the `counter_total` method.
 
 ```ruby
-Tabs.counter_total("website-visits") #=> 476873
+TabsTabs .counter_total("website-visits") #=> 476873
 ```
 
 ### Value Metrics
 
 Value metrics record a value at a point in time and calculate the min, max, avg, and sum for a given time resolution.  Creating a value metric is easy:
 
-To record a value, simply call `Tabs#record_value`.
+To record a value, simply call `TabsTabs #record_value`.
 
 ```ruby
-Tabs.record_value("new-user-age", 32)
+TabsTabs .record_value("new-user-age", 32)
 ```
 
 If you need to retroactively record a value for a specific
 timestamp, just pass it in.
 
 ```ruby
-Tabs.increment_counter("new-user-age", 19, Time.now - 2.days)
+TabsTabs .increment_counter("new-user-age", 19, Time.now - 2.days)
 ```
 
 This will also create a value metric the first time, you can manually create
 a metric as well:
 
 ```ruby
-Tabs.create_metric("new-user-age", "value")
+TabsTabs .create_metric("new-user-age", "value")
 ```
 
 Retrieving the stats for a value metric is just like retrieving a counter metric.
 
 ```ruby
-Tabs.get_stats("new-user-age", 6.months.ago..Time.now, :month)
+TabsTabs .get_stats("new-user-age", 6.months.ago..Time.now, :month)
 ```
 
-This will return a `Tabs::Metrics::Value::Stats` object.  Again, this
+This will return a `TabsTabs ::Metrics::Value::Stats` object.  Again, this
 object is enumerable and encapsulates all the timestamps within the
 given period.
 
 ```ruby
-results = Tabs.get_stats("new-user-age", 6.months.ago..Time.now, :month)
+results = TabsTabs .get_stats("new-user-age", 6.months.ago..Time.now, :month)
 results.each { |r| puts r }
 #=>
   { timestamp: 2000-01-01 00:00:00, count: 9, min: 19, max: 54, sum: 226, avg: 38 }
@@ -156,7 +159,7 @@ For example, tracking a user who downloads you mobile application and
 later visits your website to make a purchase.
 
 ```ruby
-Tabs.start_task("mobile-to-purchase", "2g4hj17787s")
+TabsTabs .start_task("mobile-to-purchase", "2g4hj17787s")
 ```
 
 The first argument is the metric key and the second is a unique token
@@ -165,27 +168,27 @@ token but it needs to be unique.  Use the `complete_task` method to
 finish the task:
 
 ```ruby
-Tabs.complete_task("mobile-to-purchase", "2g4hj17787s")
+TabsTabs .complete_task("mobile-to-purchase", "2g4hj17787s")
 ```
 
 If you need to retroactively start/complete a task at a specific
 timestamp, just pass it in.
 
 ```ruby
-Tabs.start_task("mobile-to-purchase", "2g4hj17787s", Time.now - 2.days)
-Tabs.complete_task("mobile-to-purchase", "2g4hj17787s", Time.now - 1.days)
+TabsTabs .start_task("mobile-to-purchase", "2g4hj17787s", Time.now - 2.days)
+TabsTabs .complete_task("mobile-to-purchase", "2g4hj17787s", Time.now - 1.days)
 ```
 
 Retrieving stats for a task metric is just like the other types:
 
 ```ruby
-Tabs.get_stats("mobile-to-purchase", 6.hours.ago..Time.now, :minute)
+TabsTabs .get_stats("mobile-to-purchase", 6.hours.ago..Time.now, :minute)
 ```
 
-This will return a `Tabs::Metrics::Task::Stats` object:
+This will return a `TabsTabs ::Metrics::Task::Stats` object:
 
 ```ruby
-results = Tabs.get_stats("mobile-to-purchase", 6.hours.ago..Time.now, :minute)
+results = TabsTabs .get_stats("mobile-to-purchase", 6.hours.ago..Time.now, :minute)
 results.started_within_period       #=> Number of items started in period
 results.completed_within_period     #=> Number of items completed in period
 results.started_and_completed_within_period  #=> Items wholly started/completed in period
@@ -195,7 +198,7 @@ results.average_completion_time     #=> Average time for the task to be complete
 
 ### Resolutions
 
-When tabs increments a counter or records a value it does so for each of the following "resolutions".  You may supply any of these as the last argument to the `Tabs#get_stats` method.
+When TabsTabs increments a counter or records a value it does so for each of the following "resolutions".  You may supply any of these as the last argument to the `TabsTabs #get_stats` method.
 
     :minute, :hour, :day, :week, :month, :year
 
@@ -208,7 +211,7 @@ that's necessary is a module that conforms to the following protocol:
 
 ```ruby
 module SecondResolution
-  include Tabs::Resolutionable
+  include TabsTabs ::Resolutionable
   extend self
 
   PATTERN = "%Y-%m-%d-%H-%M-%S"
@@ -272,11 +275,11 @@ of the week.
 the code a bit.*
 
 Once you have a module that conforms to the resolution protocol you need
-to register it with Tabs.  You can do this in one of two ways:
+to register it with TabsTabs .  You can do this in one of two ways:
 
 ```ruby
-# This call can be anywhere before you start using tabs
-Tabs::Resolution.register(SecondResolution)
+tabstabs
+TabsTabs ::Resolution.register(SecondResolution)
 
 # or, you can use the config block described below
 ```
@@ -286,7 +289,7 @@ Tabs::Resolution.register(SecondResolution)
 You can also remove any resolution (custom or built-in) by calling the `unregister_resolutions` method in the config block (see config section below).  Or, you can remove manually by calling:
 
 ```ruby
-Tabs::Resolution.unregister(:minute, :hour)
+TabsTabs ::Resolution.unregister(:minute, :hour)
 ```
 
 ### Inspecting Metrics
@@ -294,49 +297,49 @@ Tabs::Resolution.unregister(:minute, :hour)
 You can list all metrics using `list_metrics`:
 
 ```ruby
-Tabs.list_metrics #=> ["website-visits", "new-user-age"]
+TabsTabs .list_metrics #=> ["website-visits", "new-user-age"]
 ```
 
 You can check a metric's type (counter of value) by calling
 `metric_type`:
 
 ```ruby
-Tabs.metric_type("website-visits") #=> "counter"
+TabsTabs .metric_type("website-visits") #=> "counter"
 ```
 
 And you can quickly check if a metric exists:
 
 ```ruby
-Tabs.metric_exists?("foobar") #=> false
+TabsTabs .metric_exists?("foobar") #=> false
 ```
 
 ### Drop a Metric
 
-To drop a metric, just call `Tabs#drop_metric`
+To drop a metric, just call `TabsTabs #drop_metric`
 
 ```ruby
-Tabs.drop_metric!("website-visits")
+TabsTabs .drop_metric!("website-visits")
 ```
 
 This will drop all recorded values for the metric so it may not be un-done...be careful.
 
-To drop only a specific resolution for a metric, just call `Tabs#drop_resolution_for_metric!`
+To drop only a specific resolution for a metric, just call `TabsTabs #drop_resolution_for_metric!`
 
 ```ruby
-Tabs.drop_resolution_for_metric!("website-visits", :minute)
+TabsTabs .drop_resolution_for_metric!("website-visits", :minute)
 ```
 
 Even more dangerous, you can drop all metrics...be very careful.
 
 ```ruby
-Tabs.drop_all_metrics!
+TabsTabs .drop_all_metrics!
 ```
 ### Aging Out Old Metrics
 
 You can use the expiration features to age out old metrics that may no longer be in your operational data set.  For example, you may want to keep monthly or yearly data around but the minute or day level data isn't necessary past a certain date.  You can set expirations for any resolution:
 
 ```ruby
-Tabs.configure do |config|
+TabsTabs .configure do |config|
   config.set_expirations(minute: 1.day, day: 1.week)
 end
 ```
@@ -348,10 +351,10 @@ values.*
 
 ### Configuration
 
-Tabs just works out of the box. However, if you want to override the default Redis connection or decimal precision, this is how:
+TabsTabs  just works out of the box. However, if you want to override the default Redis connection or decimal precision, this is how:
 
 ```ruby
-Tabs.configure do |config|
+TabsTabs .configure do |config|
 
   # set it to an existing connection
   config.redis = Redis.current
@@ -359,8 +362,8 @@ Tabs.configure do |config|
   # pass a config hash that will be passed to Redis.new
   config.redis = { :host => 'localhost', :port => 6379 }
 
-  # pass a prefix that will be used in addition to the "tabs" prefix with Redis keys
-  # Example: "tabs:my_app:metric_name"
+  tabstabs
+  tabstabs
   config.prefix = "my_app"
 
   # override default decimal precision (5)
@@ -382,64 +385,27 @@ end
 #### Prefixing
 
 Many applications use a single Redis instance for a number of uses:
-background jobs, ephemeral data, Tabs, etc.  To avoid key collisions,
-and to make it easier to drop all of your tabs data without affecting
+background jobs, ephemeral data, TabsTabs , etc.  To avoid key collisions,
+and to make it easier to drop all of your TabsTabs data without affecting
 other parts of your system (or if more than one app shares the Redis
 instance) you can prefix a given 'instance'.
 
-Setting the prefix config option will cause all of the keys that tabs
+Setting the prefix config option will cause all of the keys that TabsTabs
 stores to use this format:
 
 ```
-tabs:#{prefix}:#{key}..."
+tabstabs:#{prefix}:#{key}..."
 ```
 
 ## Change Log & Breaking Changes
 
-### v0.6.0
+### v2.0.0
 
-Please note that when the library version went from v0.5.6 to v0.6.0 some of
-the key patterns used to store metrics in Redis were changed.  If you upgrade
-an app to v0.6.0 the previous set of data will not be picked up by tabs.
-Please use v0.6.x on new applications only.  However, the 'Task' metric
-type will only be available in v0.6.0 and above.
+Fork of [Tabs](https://github.com/devmynd/tabs) due to its discontinuation
+and incompatibility with newer Redis versions.
 
-### v0.8.0
-
-In version 0.8.0 and higher the get_stats method returns a more robust
-object instead of just an array of hashes.  These stats objects are
-enumerable and most existing code utilizing tabs should continue to
-function.  However, please review the docs for more information if you
-encounter issues when upgrading.
-
-### v0.8.2
-
-In version 0.8.2 and higher the storage keys for value metrics have been
-changed.  Originally the various pieces (avg, sum, count, etc) were
-stored in a JSON serialized string in a single key.  The intent was that
-this would comprise a poor-mans transaction of sorts.  The downside
-however was a major hit on performance when doing a lot of writes or
-reading stats for a large date range.  In v0.8.2 these component values
-are stored in a real Redis hash and updated atomically when a value is
-recorded.  In future versions this will be changed to use a MULTI
-statement to simulate a transaction.  Value data that was recorded prior
-to v0.8.2 will not be accessible in this or future versions so please
-continue to use v0.8.1 or lower if that is an issue.
-
-### v1.0.0
-
-_WARNING: Version 1.0.0 is not compatible with previous versions of
-Tabs_
-
-We have made a number of changes related to how our metric keys are stored
-in Redis.  At this point we'll be following semantic versioning and will
-support backwards compatability between major versions.  In this release
-we've added a number of major features:
-
-* Metric expiration
-* Key prefixes
-* Support for unregistering resolutions
-* A number of small numeric fixes
+- Relaxed redis-rb version requirement
+- Updated specs to new syntax
 
 ## Contributing
 
@@ -448,3 +414,9 @@ we've added a number of major features:
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+
+## Special Thanks
+
+Thanks to [@DevMynd](https://github.com/devmynd) for creating the initial version
+of this gem!
