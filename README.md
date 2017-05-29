@@ -1,5 +1,4 @@
-![Travis Status](https://api.travis-ci.org/FHG-IMW/tabstabs.png)
-
+[![Build Status](https://travis-ci.org/FHG-IMW/tabstabs.svg?branch=master)](https://travis-ci.org/FHG-IMW/tabstabs)
 # TabsTabs
 
 TabsTabs  is a redis-backed metrics tracker for time-based events that supports counts, sums,
